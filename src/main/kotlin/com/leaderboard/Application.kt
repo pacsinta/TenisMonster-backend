@@ -1,6 +1,7 @@
 package com.example
 
-import com.example.plugins.*
+import com.example.plugins.configureRouting
+import com.leaderboard.plugins.configureSerialization
 import com.leaderboard.DatabaseManager
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
