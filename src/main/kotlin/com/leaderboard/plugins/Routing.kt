@@ -1,4 +1,4 @@
-package com.example.plugins
+package com.leaderboard.plugins
 
 import com.leaderboard.DatabaseManager
 import io.ktor.http.*
@@ -8,14 +8,16 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
-        get("/getScore") {
-            val name = call.request.queryParameters["name"]
+        get("/score/{name}") {
+            val name = call.parameters["name"]
+            call.application.environment.log.info("getScore: name=$name")
+
             if (name == null) {
                 call.respondText("Name is required", status = HttpStatusCode.BadRequest)
                 return@get
             }
-            val score = DatabaseManager.getScore(name)
-            call.respondText(score.toString())
+            val score = DatabaseManager.getElementByName(name)
+            call.respond(score)
         }
         post("/setScore") {
             val name = call.request.queryParameters["name"]
@@ -27,7 +29,7 @@ fun Application.configureRouting() {
             DatabaseManager.setScore(name, score.toInt())
             call.respond(HttpStatusCode.OK)
         }
-        get("/getLeaderBoard") {
+        get("/leaderboard") {
             val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
             val leaderBoard = DatabaseManager.getLeaderBoard(limit)
             call.respond(leaderBoard)

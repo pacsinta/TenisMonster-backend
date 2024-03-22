@@ -17,14 +17,14 @@ object DatabaseManager : ILeaderBoard {
     }
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
-    private fun resultRowToPlayerInfo(row: ResultRow) = PlayerInfo(
+    private fun resultRowToPlayerInfo(row: ResultRow) = LeaderBoardElement(
         name = row[LeaderBoard.name],
         score = row[LeaderBoard.score]
     )
-    override suspend fun getScore(name: String): Int = dbQuery {
+    override suspend fun getElementByName(name: String): LeaderBoardElement = dbQuery {
         LeaderBoard.select { LeaderBoard.name eq name }
-            .map { it[LeaderBoard.score] }
-            .singleOrNull() ?: 0
+            .mapNotNull { resultRowToPlayerInfo(it) }
+            .singleOrNull() ?: LeaderBoardElement(name, 0)
     }
 
     override suspend fun setScore(name: String, score: Int): Unit = dbQuery {
@@ -34,7 +34,7 @@ object DatabaseManager : ILeaderBoard {
         }
     }
 
-    override suspend fun getLeaderBoard(limit: Int): List<PlayerInfo> = dbQuery {
+    override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> = dbQuery {
         LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score).map { resultRowToPlayerInfo(it) }
     }
 }

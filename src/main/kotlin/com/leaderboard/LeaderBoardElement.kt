@@ -2,7 +2,7 @@ package com.leaderboard
 
 import org.jetbrains.exposed.sql.Table
 
-data class PlayerInfo(val name: String, val score: Int)
+data class LeaderBoardElement(val name: String, val score: Int)
 
 object LeaderBoard : Table() {
     val name = varchar("name", 50)
