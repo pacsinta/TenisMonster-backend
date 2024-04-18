@@ -1,13 +1,14 @@
 package com.leaderboard.plugins
 
 import com.leaderboard.DatabaseManager
+import com.leaderboard.ILeaderBoard
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
+fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager) {
     routing {
         get("/score/{name}") {
             val name = call.parameters["name"]
@@ -17,7 +18,7 @@ fun Application.configureRouting() {
                 call.respondText("Name is required", status = HttpStatusCode.BadRequest)
                 return@get
             }
-            val score = DatabaseManager.getElementByName(name)
+            val score = databaseManager.getElementByName(name)
             call.respond(score)
         }
         post("/score/{name}") {
@@ -30,12 +31,12 @@ fun Application.configureRouting() {
                 call.respondText("Name and score are required", status = HttpStatusCode.BadRequest)
                 return@post
             }
-            DatabaseManager.setScore(name, score.toInt())
+            databaseManager.setScore(name, score.toInt())
             call.respond(HttpStatusCode.OK)
         }
         get("/leaderboard") {
             val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
-            val leaderBoard = DatabaseManager.getLeaderBoard(limit)
+            val leaderBoard = databaseManager.getLeaderBoard(limit)
             call.respond(leaderBoard)
         }
     }
