@@ -15,12 +15,15 @@ object DatabaseManager : ILeaderBoard {
             SchemaUtils.create(LeaderBoard)
         }
     }
+
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
+
     private fun resultRowToPlayerInfo(row: ResultRow) = LeaderBoardElement(
         name = row[LeaderBoard.name],
         score = row[LeaderBoard.score]
     )
+
     override suspend fun getElementByName(name: String): LeaderBoardElement = dbQuery {
         LeaderBoard.select { LeaderBoard.name eq name }
             .mapNotNull { resultRowToPlayerInfo(it) }
@@ -28,9 +31,15 @@ object DatabaseManager : ILeaderBoard {
     }
 
     override suspend fun setScore(name: String, score: Int): Unit = dbQuery {
-        LeaderBoard.insert {
-            it[LeaderBoard.name] = name
-            it[LeaderBoard.score] = score
+        if (LeaderBoard.select { LeaderBoard.name eq name }.count() == 0L) {
+            LeaderBoard.insert {
+                it[LeaderBoard.name] = name
+                it[LeaderBoard.score] = 0
+            }
+        } else {
+            LeaderBoard.update({ LeaderBoard.name eq name }) {
+                it[LeaderBoard.score] = score
+            }
         }
     }
 
