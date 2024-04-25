@@ -31,7 +31,11 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
                 call.respondText("Name and score are required", status = HttpStatusCode.BadRequest)
                 return@post
             }
-            databaseManager.setScore(name, score.toInt())
+            val newScore = databaseManager.getElementByName(name).score + score
+            if(newScore >= 0) {
+                databaseManager.setScore(name, newScore)
+            }
+
             call.respond(HttpStatusCode.OK)
         }
         get("/leaderboard") {

@@ -45,6 +45,19 @@ class ApplicationTest {
         assertEquals(HttpStatusCode.OK, response.status)
     }
 
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testSetNegativeScore() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager)
+        }
+        val response = client.post("/score/playerName") {
+            body = "-100"
+        }
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+
     @Test
     fun testGetLeaderBoard() = testApplication {
         application {
