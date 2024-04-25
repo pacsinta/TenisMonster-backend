@@ -31,12 +31,10 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
                 call.respondText("Name and score are required", status = HttpStatusCode.BadRequest)
                 return@post
             }
-            val newScore = databaseManager.getElementByName(name).score + score
-            if(newScore >= 0) {
-                databaseManager.setScore(name, newScore)
-            }
+            val newScore = (databaseManager.getElementByName(name).score + score).coerceAtLeast(0)
+            databaseManager.setScore(name, newScore)
 
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, "Score updated")
         }
         get("/leaderboard") {
             val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
