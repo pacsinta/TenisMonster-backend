@@ -1,7 +1,8 @@
 package com.example
 
-import com.leaderboard.ILeaderBoard
-import com.leaderboard.LeaderBoardElement
+import com.leaderboard.*
+import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.transactions.transaction
 
 object MockDatabaseManager : ILeaderBoard {
     override suspend fun getElementByName(name: String): LeaderBoardElement {
@@ -14,5 +15,13 @@ object MockDatabaseManager : ILeaderBoard {
 
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> {
         return emptyList()
+    }
+}
+
+object InMemoryDatabase : DatabaseManagerBase() {
+    fun deleteAll() {
+        transaction {
+            LeaderBoard.deleteAll()
+        }
     }
 }

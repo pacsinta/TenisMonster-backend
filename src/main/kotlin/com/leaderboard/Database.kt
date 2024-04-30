@@ -5,11 +5,12 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object DatabaseManager : ILeaderBoard {
-    fun init() {
+object DatabaseManager : DatabaseManagerBase()
+
+open class DatabaseManagerBase : ILeaderBoard {
+    fun init(jdbcUrl: String = "jdbc:h2:file:./build/db") {
         val driverClassName = "org.h2.Driver"
-        val jdbcURL = "jdbc:h2:file:./build/db"
-        val database = Database.connect(jdbcURL, driverClassName)
+        val database = Database.connect(jdbcUrl, driverClassName)
 
         transaction(database) {
             SchemaUtils.create(LeaderBoard)
@@ -34,7 +35,7 @@ object DatabaseManager : ILeaderBoard {
         if (LeaderBoard.select { LeaderBoard.name eq name }.count() == 0L) {
             LeaderBoard.insert {
                 it[LeaderBoard.name] = name
-                it[LeaderBoard.score] = 0
+                it[LeaderBoard.score] = score
             }
         } else {
             LeaderBoard.update({ LeaderBoard.name eq name }) {
@@ -44,6 +45,6 @@ object DatabaseManager : ILeaderBoard {
     }
 
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> = dbQuery {
-        LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score).map { resultRowToPlayerInfo(it) }
+        LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score to SortOrder.DESC).map { resultRowToPlayerInfo(it) }
     }
 }

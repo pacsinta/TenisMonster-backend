@@ -10,7 +10,7 @@ import io.ktor.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ApplicationTest {
+class RoutingTest {
     @Test
     fun testGetScore() = testApplication {
         application {
