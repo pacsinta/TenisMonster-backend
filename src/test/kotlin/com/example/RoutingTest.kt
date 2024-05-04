@@ -40,7 +40,7 @@ class RoutingTest {
             configureRouting(MockDatabaseManager)
         }
         val response = client.post("/score/playerName") {
-            body = "100"
+            body = "100;pwd"
         }
         assertEquals(HttpStatusCode.OK, response.status)
     }
@@ -53,7 +53,7 @@ class RoutingTest {
             configureRouting(MockDatabaseManager)
         }
         val response = client.post("/score/playerName") {
-            body = "-100"
+            body = "-100;pwd"
         }
         assertEquals(HttpStatusCode.OK, response.status)
     }

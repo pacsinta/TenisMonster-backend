@@ -31,11 +31,13 @@ open class DatabaseManagerBase : ILeaderBoard {
             .singleOrNull() ?: LeaderBoardElement(name, 0)
     }
 
-    override suspend fun setScore(name: String, score: Int): Unit = dbQuery {
+    override suspend fun setScore(name: String, score: Int, password: ByteArray, salt: ByteArray): Unit = dbQuery {
         if (LeaderBoard.select { LeaderBoard.name eq name }.count() == 0L) {
             LeaderBoard.insert {
                 it[LeaderBoard.name] = name
                 it[LeaderBoard.score] = score
+                it[LeaderBoard.password] = password
+                it[LeaderBoard.salt] = salt
             }
         } else {
             LeaderBoard.update({ LeaderBoard.name eq name }) {
@@ -46,5 +48,23 @@ open class DatabaseManagerBase : ILeaderBoard {
 
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> = dbQuery {
         LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score to SortOrder.DESC).map { resultRowToPlayerInfo(it) }
+    }
+
+    override suspend fun getPasswordAndSalt(name: String): PasswordAndSalt = dbQuery {
+        LeaderBoard.select { LeaderBoard.name eq name }
+            .mapNotNull {
+                PasswordAndSalt(
+                    password = it[LeaderBoard.password],
+                    salt = it[LeaderBoard.salt]
+                )
+            }
+            .singleOrNull() ?: PasswordAndSalt(ByteArray(0), ByteArray(0))
+    }
+
+
+
+    override suspend fun userExists(name: String): Boolean = dbQuery {
+        LeaderBoard.select { LeaderBoard.name eq name }
+            .count() > 0
     }
 }

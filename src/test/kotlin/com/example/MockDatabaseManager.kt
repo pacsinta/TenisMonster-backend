@@ -9,12 +9,20 @@ object MockDatabaseManager : ILeaderBoard {
         return LeaderBoardElement(name, 0)
     }
 
-    override suspend fun setScore(name: String, score: Int) {
+    override suspend fun setScore(name: String, score: Int, password: ByteArray, salt: ByteArray) {
 
+    }
+
+    override suspend fun getPasswordAndSalt(name: String): PasswordAndSalt {
+        return PasswordAndSalt(ByteArray(0), ByteArray(0))
     }
 
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> {
         return emptyList()
+    }
+
+    override suspend fun userExists(name: String): Boolean {
+        return false
     }
 }
 
