@@ -89,5 +89,38 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
 
             call.respond(HttpStatusCode.OK, "Authenticated")
         }
+        post("/auth/change/{name}") {
+            val name = call.parameters["name"]
+            val body = call.receiveText().split(";")
+            call.application.environment.log.info("changePassword: name=$name -> $body")
+            if(body.size != 2) {
+                call.respondText("New and old passwords are required", status = HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            val oldPwd = body[0]
+            val newPwd = body[1]
+            if (name.isNullOrBlank() || newPwd.isBlank() || oldPwd.isBlank()) {
+                call.respondText("Name, new and old passwords can't be empty", status = HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            if(!databaseManager.userExists(name)) {
+                call.respondText("User does not exist", status = HttpStatusCode.OK)
+                return@post
+            }
+
+            val hashData = databaseManager.getPasswordAndSalt(name)
+            if(!SecureStore.secureCheck(oldPwd, hashData.salt, hashData.password)) {
+                call.respondText("Incorrect password", status = HttpStatusCode.Unauthorized)
+                return@post
+            }
+
+            val salt = SecureStore.createSalt()
+            val hash = SecureStore.hashPassword(newPwd, salt)
+            databaseManager.changePassword(name, hash, salt)
+
+            call.respond(HttpStatusCode.OK, "Password changed")
+        }
     }
 }

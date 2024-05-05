@@ -17,6 +17,10 @@ object MockDatabaseManager : ILeaderBoard {
         return PasswordAndSalt(ByteArray(0), ByteArray(0))
     }
 
+    override suspend fun changePassword(name: String, newPassword: ByteArray, salt: ByteArray) {
+
+    }
+
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> {
         return emptyList()
     }

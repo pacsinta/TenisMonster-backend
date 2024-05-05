@@ -61,7 +61,12 @@ open class DatabaseManagerBase : ILeaderBoard {
             .singleOrNull() ?: PasswordAndSalt(ByteArray(0), ByteArray(0))
     }
 
-
+    override suspend fun changePassword(name: String, newPassword: ByteArray, salt: ByteArray): Unit = dbQuery {
+        LeaderBoard.update({ LeaderBoard.name eq name }) {
+            it[password] = newPassword
+            it[LeaderBoard.salt] = salt
+        }
+    }
 
     override suspend fun userExists(name: String): Boolean = dbQuery {
         LeaderBoard.select { LeaderBoard.name eq name }
