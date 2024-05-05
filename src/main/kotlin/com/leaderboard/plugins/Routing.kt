@@ -15,7 +15,7 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
             val name = call.parameters["name"]
             call.application.environment.log.info("getScore: name=$name")
 
-            if (name == null) {
+            if (name.isNullOrBlank()) {
                 call.respondText("Name is required", status = HttpStatusCode.BadRequest)
                 return@get
             }
@@ -33,7 +33,7 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
 
             val score = body[0].toIntOrNull()
             val pwd = body[1]
-            if (name == null || score == null || pwd.isBlank()) {
+            if (name.isNullOrBlank() || score == null || pwd.isBlank()) {
                 call.respondText("Name, score and password are required", status = HttpStatusCode.BadRequest)
                 return@post
             }
@@ -70,7 +70,7 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
             val pwd = call.receiveText()
             call.application.environment.log.info("auth: name=$name")
 
-            if (name == null || pwd.isBlank()) {
+            if (name.isNullOrBlank() || pwd.isBlank()) {
                 call.respondText("Name and password are required", status = HttpStatusCode.BadRequest)
                 return@post
             }
