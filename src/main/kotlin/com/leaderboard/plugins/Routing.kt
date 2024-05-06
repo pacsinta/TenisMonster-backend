@@ -76,8 +76,12 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
             }
 
             if(!databaseManager.userExists(name)) {
-                // If the user does not exist, return a 200 OK status code
-                call.respondText("User does not exist", status = HttpStatusCode.OK)
+                val salt = SecureStore.createSalt()
+                val hash = SecureStore.hashPassword(pwd, salt)
+                databaseManager.setScore(name, 0, hash, salt)
+
+                println("New user created with name: $name")
+                call.respondText("New user was created", status = HttpStatusCode.OK)
                 return@post
             }
 
@@ -87,6 +91,7 @@ fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager
                 return@post
             }
 
+            println("User authenticated with name: $name")
             call.respond(HttpStatusCode.OK, "Authenticated")
         }
         post("/auth/change/{name}") {
