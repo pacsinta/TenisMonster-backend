@@ -1,4 +1,4 @@
-package com.leaderboard
+package com.leaderboard.database
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.*

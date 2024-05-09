@@ -15,7 +15,7 @@ class RoutingTest {
     fun testGetScore() = testApplication {
         application {
             configureSerialization()
-            configureRouting(MockDatabaseManager)
+            configureRouting(MockDatabaseManager, MockSecureStore)
         }
         val response = client.get("/score/playerName")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -26,7 +26,7 @@ class RoutingTest {
     fun testSetEmptyScore() = testApplication {
         application {
             configureSerialization()
-            configureRouting(MockDatabaseManager)
+            configureRouting(MockDatabaseManager, MockSecureStore)
         }
         val response = client.post("/score/playerName")
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -37,7 +37,7 @@ class RoutingTest {
     fun testSetScore() = testApplication {
         application {
             configureSerialization()
-            configureRouting(MockDatabaseManager)
+            configureRouting(MockDatabaseManager, MockSecureStore)
         }
         val response = client.post("/score/playerName") {
             body = "100;pwd"
@@ -50,7 +50,7 @@ class RoutingTest {
     fun testSetNegativeScore() = testApplication {
         application {
             configureSerialization()
-            configureRouting(MockDatabaseManager)
+            configureRouting(MockDatabaseManager, MockSecureStore)
         }
         val response = client.post("/score/playerName") {
             body = "-100;pwd"
@@ -62,7 +62,7 @@ class RoutingTest {
     fun testGetLeaderBoard() = testApplication {
         application {
             configureSerialization()
-            configureRouting(MockDatabaseManager)
+            configureRouting(MockDatabaseManager, MockSecureStore)
         }
         val response = client.get("/leaderboard")
         assertEquals(HttpStatusCode.OK, response.status)

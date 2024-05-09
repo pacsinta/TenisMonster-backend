@@ -15,8 +15,12 @@ import org.junit.Test
 
 class DatabaseTest {
     @Before
-    fun setupDatabase() {
+    fun setupDatabase() = runBlocking {
         InMemoryDatabase.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+        InMemoryDatabase.addUser("playerName")
+        for (i in 1..numberOfPlayers) {
+            InMemoryDatabase.addUser("player$i")
+        }
     }
 
     @After
@@ -30,7 +34,7 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase)
+                configureRouting(InMemoryDatabase, MockSecureStore)
             }
 
             val post = client.post("/score/playerName") {
@@ -51,7 +55,7 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase)
+                configureRouting(InMemoryDatabase, MockSecureStore)
             }
 
             val post = client.post("/score/playerName") {
@@ -66,16 +70,17 @@ class DatabaseTest {
         }
     }
 
+    private val numberOfPlayers = 5
     @OptIn(InternalAPI::class)
     @Test
     fun testLeaderboard() = runBlocking {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase)
+                configureRouting(InMemoryDatabase, MockSecureStore)
             }
 
-            for (i in 1..5) {
+            for (i in 1..numberOfPlayers) {
                 val post = client.post("/score/player$i") {
                     body = "$i;pwd"
                 }

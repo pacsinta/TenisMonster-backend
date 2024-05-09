@@ -34,8 +34,8 @@ class AuthenticationTest {
             }
 
             // Create a new user
-            val post = client.post("/score/playerName") {
-                body = "2;password"
+            val post = client.post("/auth/playerName") {
+                body = "password"
             }
             assertEquals(HttpStatusCode.OK, post.status)
             delay(1000) // wait for the database to update
@@ -76,8 +76,8 @@ class AuthenticationTest {
             }
 
             // Create a new user
-            val post = client.post("/score/playerName") {
-                body = "2;password"
+            val post = client.post("/auth/playerName") {
+                body = "password"
             }
             assertEquals(HttpStatusCode.OK, post.status)
             delay(1000) // wait for the database to update

@@ -1,5 +1,6 @@
 package com.leaderboard
 
+import com.leaderboard.database.DatabaseManager
 import com.leaderboard.plugins.configureRouting
 import com.leaderboard.plugins.configureSerialization
 import io.ktor.server.application.*

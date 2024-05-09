@@ -1,7 +1,9 @@
 package com.example
 
-import com.leaderboard.*
+import com.leaderboard.database.*
+import com.leaderboard.securestore.SecureStore
 import org.jetbrains.exposed.sql.deleteAll
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object MockDatabaseManager : ILeaderBoard {
@@ -14,7 +16,7 @@ object MockDatabaseManager : ILeaderBoard {
     }
 
     override suspend fun getPasswordAndSalt(name: String): PasswordAndSalt {
-        return PasswordAndSalt(ByteArray(0), ByteArray(0))
+        return PasswordAndSalt(ByteArray(16), ByteArray(16))
     }
 
     override suspend fun changePassword(name: String, newPassword: ByteArray, salt: ByteArray) {
@@ -26,7 +28,7 @@ object MockDatabaseManager : ILeaderBoard {
     }
 
     override suspend fun userExists(name: String): Boolean {
-        return false
+        return true
     }
 }
 
@@ -34,6 +36,20 @@ object InMemoryDatabase : DatabaseManagerBase() {
     fun deleteAll() {
         transaction {
             LeaderBoard.deleteAll()
+        }
+    }
+
+    fun addUser(name: String){
+        val salt = SecureStore.createSalt()
+        val hash = SecureStore.hashPassword("pwd", salt)
+
+        transaction {
+            LeaderBoard.insert {
+                it[LeaderBoard.name] = name
+                it[LeaderBoard.score] = 0
+                it[LeaderBoard.password] = hash
+                it[LeaderBoard.salt] = salt
+            }
         }
     }
 }

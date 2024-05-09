@@ -1,4 +1,4 @@
-package com.leaderboard
+package com.leaderboard.database
 
 interface ILeaderBoard {
     suspend fun getElementByName(name: String): LeaderBoardElement
