@@ -1,6 +1,6 @@
 package com.example
 
-import com.leaderboard.plugins.configureRouting
+import com.leaderboard.routes.configureRouting
 import com.leaderboard.plugins.configureSerialization
 import io.ktor.client.request.*
 import io.ktor.http.*

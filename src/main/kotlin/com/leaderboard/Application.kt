@@ -1,8 +1,8 @@
 package com.leaderboard
 
 import com.leaderboard.database.DatabaseManager
-import com.leaderboard.plugins.configureRouting
 import com.leaderboard.plugins.configureSerialization
+import com.leaderboard.routes.configureRouting
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
