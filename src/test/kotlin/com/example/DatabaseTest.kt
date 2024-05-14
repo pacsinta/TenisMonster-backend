@@ -16,7 +16,9 @@ import org.junit.Test
 class DatabaseTest {
     @Before
     fun setupDatabase() = runBlocking {
+        // The DB_CLOSE_DELAY=-1 parameter keeps the in-memory database open until the tests are running
         InMemoryDatabase.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+
         InMemoryDatabase.addUser("playerName")
         for (i in 1..numberOfPlayers) {
             InMemoryDatabase.addUser("player$i")
