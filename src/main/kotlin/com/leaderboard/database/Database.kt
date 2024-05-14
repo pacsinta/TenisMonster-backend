@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseManager : DatabaseManagerBase()
 
-open class DatabaseManagerBase : ILeaderBoard {
+abstract class DatabaseManagerBase : ILeaderBoard {
     fun init(jdbcUrl: String = "jdbc:h2:file:./build/db") {
         val driverClassName = "org.h2.Driver"
         val database = Database.connect(jdbcUrl, driverClassName)
