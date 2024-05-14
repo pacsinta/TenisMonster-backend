@@ -68,4 +68,82 @@ class RoutingTest {
         assertEquals(HttpStatusCode.OK, response.status)
         assertEquals("[]", response.bodyAsText())
     }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testAuth() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/playerName") {
+            body = "password"
+        }
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testEmptyPasswordAuth() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/playerName") {
+            body = ""
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testPasswordChange() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/change/playerName") {
+            body = "password;newPassword"
+        }
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testEmptyNewPasswordChange() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/change/playerName") {
+            body = "password;"
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testEmptyOldPasswordChange() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/change/playerName") {
+            body = ";newPassword"
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testEmptyPasswordChange() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val response = client.post("/auth/change/playerName") {
+            body = ""
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
 }
