@@ -15,7 +15,7 @@ object SecureStore : ISecureStore {
     override fun hashPassword(password: String, salt: ByteArray): ByteArray {
         val keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
         val hash = keyFactory.generateSecret(
-            PBEKeySpec(password.toCharArray(), salt, 10000, 128)
+            PBEKeySpec(password.toCharArray(), salt, 100000, 256)
         ).encoded
 
         return hash
