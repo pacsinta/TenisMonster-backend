@@ -97,6 +97,20 @@ class RoutingTest {
 
     @OptIn(InternalAPI::class)
     @Test
+    fun testTooLongNameAuth() = testApplication {
+        application {
+            configureSerialization()
+            configureRouting(MockDatabaseManager, MockSecureStore)
+        }
+        val name = "a".repeat(51)
+        val response = client.post("/auth/$name") {
+            body = "password"
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @OptIn(InternalAPI::class)
+    @Test
     fun testPasswordChange() = testApplication {
         application {
             configureSerialization()

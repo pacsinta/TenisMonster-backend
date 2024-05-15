@@ -20,6 +20,10 @@ fun Application.configureAuthRouting(databaseManager: ILeaderBoard, secureStore:
                     call.respondText("Name and password are required", status = HttpStatusCode.BadRequest)
                     return@post
                 }
+                else if(name.length > 50){
+                    call.respondText("Name is too long", status = HttpStatusCode.BadRequest)
+                    return@post
+                }
 
                 if(!databaseManager.userExists(name)) {
                     val salt = secureStore.createSalt()
