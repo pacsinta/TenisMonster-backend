@@ -20,14 +20,9 @@ abstract class DatabaseManagerBase : ILeaderBoard {
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    private fun resultRowToPlayerInfo(row: ResultRow) = LeaderBoardElement(
-        name = row[LeaderBoard.name],
-        score = row[LeaderBoard.score]
-    )
-
     override suspend fun getElementByName(name: String): LeaderBoardElement = dbQuery {
         LeaderBoard.select { LeaderBoard.name eq name }
-            .mapNotNull { resultRowToPlayerInfo(it) }
+            .mapNotNull { LeaderBoardElement(it[LeaderBoard.name], it[LeaderBoard.score]) }
             .singleOrNull() ?: LeaderBoardElement(name, 0)
     }
 
@@ -47,7 +42,12 @@ abstract class DatabaseManagerBase : ILeaderBoard {
     }
 
     override suspend fun getLeaderBoard(limit: Int): List<LeaderBoardElement> = dbQuery {
-        LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score to SortOrder.DESC).map { resultRowToPlayerInfo(it) }
+        LeaderBoard.selectAll().limit(limit).orderBy(LeaderBoard.score to SortOrder.DESC).map {
+            LeaderBoardElement(
+                name = it[LeaderBoard.name],
+                score = it[LeaderBoard.score]
+            )
+        }
     }
 
     override suspend fun getPasswordAndSalt(name: String): PasswordAndSalt = dbQuery {
