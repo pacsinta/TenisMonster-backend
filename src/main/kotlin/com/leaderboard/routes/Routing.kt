@@ -9,10 +9,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting(databaseManager: ILeaderBoard = DatabaseManager, secureStore: ISecureStore = SecureStore) {
-    configureAuthRouting(databaseManager, secureStore)
-    configureScoreRouting(databaseManager, secureStore)
-
     routing {
+        configureScoreRouting(databaseManager, secureStore)
+        configureAuthRouting(databaseManager, secureStore)
+
         get("/leaderboard") {
             val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 10
             val leaderBoard = databaseManager.getLeaderBoard(limit)
