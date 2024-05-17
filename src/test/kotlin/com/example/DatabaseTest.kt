@@ -97,4 +97,27 @@ class DatabaseTest {
             assertEquals("[{\"name\":\"player5\",\"score\":5},{\"name\":\"player4\",\"score\":4},{\"name\":\"player3\",\"score\":3}]", response.bodyAsText())
         }
     }
+
+    @OptIn(InternalAPI::class)
+    @Test
+    fun testUserRegistration() = runBlocking {
+        testApplication {
+            application {
+                configureSerialization()
+                configureRouting(InMemoryDatabase, MockSecureStore)
+            }
+
+            InMemoryDatabase.deleteAll() // clean every user
+
+            val post = client.post("/auth/newPlayer") {
+                body = "pwd"
+            }
+            assertEquals(HttpStatusCode.OK, post.status)
+            delay(1000) // wait for the database to update
+
+            val response = client.get("/leaderboard")
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals("[{\"name\":\"newPlayer\",\"score\":0}]", response.bodyAsText())
+        }
+    }
 }
