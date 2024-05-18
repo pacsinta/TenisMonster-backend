@@ -1,14 +1,15 @@
 package com.example
 
-import com.leaderboard.routes.configureRouting
 import com.leaderboard.plugins.configureSerialization
+import com.leaderboard.routes.configureRouting
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -17,17 +18,17 @@ class DatabaseTest {
     @Before
     fun setupDatabase() = runBlocking {
         // The DB_CLOSE_DELAY=-1 parameter keeps the in-memory database open until the tests are running
-        InMemoryDatabase.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+        TestDatabaseManager.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
 
-        InMemoryDatabase.addUser("playerName")
+        TestDatabaseManager.addUser("playerName")
         for (i in 1..numberOfPlayers) {
-            InMemoryDatabase.addUser("player$i")
+            TestDatabaseManager.addUser("player$i")
         }
     }
 
     @After
     fun cleanDatabase() {
-        InMemoryDatabase.deleteAll()
+        TestDatabaseManager.deleteAll()
     }
 
     @OptIn(InternalAPI::class)
@@ -36,7 +37,7 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase, MockSecureStore)
+                configureRouting(TestDatabaseManager, MockSecureStore)
             }
 
             val post = client.post("/score/playerName") {
@@ -57,7 +58,7 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase, MockSecureStore)
+                configureRouting(TestDatabaseManager, MockSecureStore)
             }
 
             val post = client.post("/score/playerName") {
@@ -79,7 +80,7 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase, MockSecureStore)
+                configureRouting(TestDatabaseManager, MockSecureStore)
             }
 
             for (i in 1..numberOfPlayers) {
@@ -104,10 +105,10 @@ class DatabaseTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase, MockSecureStore)
+                configureRouting(TestDatabaseManager, MockSecureStore)
             }
 
-            InMemoryDatabase.deleteAll() // clean every user
+            TestDatabaseManager.deleteAll() // clean every user
 
             val post = client.post("/auth/newPlayer") {
                 body = "pwd"

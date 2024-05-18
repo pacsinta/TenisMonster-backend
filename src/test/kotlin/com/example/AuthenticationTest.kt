@@ -1,7 +1,7 @@
 package com.example
 
-import com.leaderboard.routes.configureRouting
 import com.leaderboard.plugins.configureSerialization
+import com.leaderboard.routes.configureRouting
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -16,12 +16,12 @@ import org.junit.Test
 class AuthenticationTest {
     @Before
     fun setupDatabase() {
-        InMemoryDatabase.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+        TestDatabaseManager.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
     }
 
     @After
     fun cleanDatabase() {
-        InMemoryDatabase.deleteAll()
+        TestDatabaseManager.deleteAll()
     }
 
     @OptIn(InternalAPI::class)
@@ -30,7 +30,7 @@ class AuthenticationTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase)
+                configureRouting(TestDatabaseManager)
             }
 
             // Create a new user
@@ -72,7 +72,7 @@ class AuthenticationTest {
         testApplication {
             application {
                 configureSerialization()
-                configureRouting(InMemoryDatabase)
+                configureRouting(TestDatabaseManager)
             }
 
             // Create a new user

@@ -32,7 +32,7 @@ object MockDatabaseManager : ILeaderBoard {
     }
 }
 
-object InMemoryDatabase : DatabaseManagerBase() {
+object TestDatabaseManager : DatabaseManagerBase() {
     fun deleteAll() {
         transaction {
             LeaderBoard.deleteAll()
@@ -46,8 +46,8 @@ object InMemoryDatabase : DatabaseManagerBase() {
         transaction {
             LeaderBoard.insert {
                 it[LeaderBoard.name] = name
-                it[LeaderBoard.score] = 0
-                it[LeaderBoard.password] = hash
+                it[score] = 0
+                it[password] = hash
                 it[LeaderBoard.salt] = salt
             }
         }
