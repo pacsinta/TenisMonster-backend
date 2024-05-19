@@ -1,21 +1,26 @@
 package com.example
 
-import com.leaderboard.routes.configureRouting
 import com.leaderboard.plugins.configureSerialization
+import com.leaderboard.routes.configureRouting
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RoutingTest {
+    private fun Application.configureModules() {
+        configureSerialization()
+        configureRouting(MockDatabaseManager, MockSecureStore)
+    }
+    
     @Test
     fun testGetScore() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.get("/score/playerName")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -25,8 +30,7 @@ class RoutingTest {
     @Test
     fun testSetEmptyScore() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/score/playerName")
         assertEquals(HttpStatusCode.BadRequest, response.status)
@@ -36,8 +40,7 @@ class RoutingTest {
     @Test
     fun testSetScore() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/score/playerName") {
             body = "100;pwd"
@@ -49,8 +52,7 @@ class RoutingTest {
     @Test
     fun testSetNegativeScore() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/score/playerName") {
             body = "-100;pwd"
@@ -61,8 +63,7 @@ class RoutingTest {
     @Test
     fun testGetLeaderBoard() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.get("/leaderboard")
         assertEquals(HttpStatusCode.OK, response.status)
@@ -73,8 +74,7 @@ class RoutingTest {
     @Test
     fun testAuth() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/playerName") {
             body = "password"
@@ -86,8 +86,7 @@ class RoutingTest {
     @Test
     fun testEmptyPasswordAuth() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/playerName") {
             body = ""
@@ -99,8 +98,7 @@ class RoutingTest {
     @Test
     fun testTooLongNameAuth() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val name = "a".repeat(51)
         val response = client.post("/auth/$name") {
@@ -113,8 +111,7 @@ class RoutingTest {
     @Test
     fun testPasswordChange() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/change/playerName") {
             body = "password;newPassword"
@@ -126,8 +123,7 @@ class RoutingTest {
     @Test
     fun testEmptyNewPasswordChange() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/change/playerName") {
             body = "password;"
@@ -139,8 +135,7 @@ class RoutingTest {
     @Test
     fun testEmptyOldPasswordChange() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/change/playerName") {
             body = ";newPassword"
@@ -152,8 +147,7 @@ class RoutingTest {
     @Test
     fun testEmptyPasswordChange() = testApplication {
         application {
-            configureSerialization()
-            configureRouting(MockDatabaseManager, MockSecureStore)
+            configureModules()
         }
         val response = client.post("/auth/change/playerName") {
             body = ""

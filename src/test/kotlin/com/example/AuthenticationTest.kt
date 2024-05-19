@@ -4,6 +4,7 @@ import com.leaderboard.plugins.configureSerialization
 import com.leaderboard.routes.configureRouting
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import junit.framework.TestCase.assertEquals
@@ -24,13 +25,17 @@ class AuthenticationTest {
         TestDatabaseManager.deleteAll()
     }
 
+    private fun Application.configureModules() {
+        configureSerialization()
+        configureRouting(TestDatabaseManager)
+    }
+
     @OptIn(InternalAPI::class)
     @Test
     fun testAuthentication() = runBlocking {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager)
+                configureModules()
             }
 
             // Create a new user
@@ -71,8 +76,7 @@ class AuthenticationTest {
     fun testPasswordChange() = runBlocking {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager)
+                configureModules()
             }
 
             // Create a new user

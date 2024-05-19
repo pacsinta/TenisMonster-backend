@@ -5,6 +5,7 @@ import com.leaderboard.routes.configureRouting
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import junit.framework.TestCase.assertEquals
@@ -31,13 +32,17 @@ class DatabaseTest {
         TestDatabaseManager.deleteAll()
     }
 
+    private fun Application.configureModules() {
+        configureSerialization()
+        configureRouting(TestDatabaseManager, MockSecureStore)
+    }
+
     @OptIn(InternalAPI::class)
     @Test
     fun testScoreUpload() = runBlocking  {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager, MockSecureStore)
+                configureModules()
             }
 
             val post = client.post("/score/playerName") {
@@ -57,8 +62,7 @@ class DatabaseTest {
     fun testNegativeScore() = runBlocking {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager, MockSecureStore)
+                configureModules()
             }
 
             val post = client.post("/score/playerName") {
@@ -79,8 +83,7 @@ class DatabaseTest {
     fun testLeaderboard() = runBlocking {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager, MockSecureStore)
+                configureModules()
             }
 
             for (i in 1..numberOfPlayers) {
@@ -104,8 +107,7 @@ class DatabaseTest {
     fun testUserRegistration() = runBlocking {
         testApplication {
             application {
-                configureSerialization()
-                configureRouting(TestDatabaseManager, MockSecureStore)
+                configureModules()
             }
 
             TestDatabaseManager.deleteAll() // clean every user
